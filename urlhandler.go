@@ -6,7 +6,7 @@ import (
     )
 
 type newURL struct {
-    URL string
+    URL     string
     err      error
 }
 
@@ -16,68 +16,45 @@ type urlHandlerResponse struct {
     err error
 }
 
-func shorten(URL string, sendStruct chan<- interface{}) {
+func shorten(URL string) *newURL {
     resp, errGet := http.Get(URL)
     shortenResponse := &newURL{}
     if errGet != nil{
         fmt.Println("Error in completing http request.")
         shortenResponse.err = errGet
-        sendStruct <- shortenResponse
+        return shortenResponse
     }
     bytes, errBytes := ioutil.ReadAll(resp.Body)
     if errBytes != nil{
         shortenResponse.err = errGet
         fmt.Println("Error in reading bytes")
-        sendStruct <- shortenResponse
+        return shortenResponse
     }
 
     shortenResponse.URL = string(bytes)
     shortenResponse.err = nil
-    sendStruct <- shortenResponse
+    return shortenResponse
 }
 
-func checkHealth(URL string, sendFlag chan<- interface{}){
+func checkHealth(URL string) bool {
+    /* TODO: return HTTP STATUS? */
     _, errGet := http.Get(URL)
     if errGet != nil {
         // error getting response
-        sendFlag <- false
-        return
+        return false
     }
-    sendFlag <- true
+    return true
 }
 
-func urlHandler(URL string) *urlHandlerResponse{
+func urlHandler(URL string) string{
     API := "https://tinyurl.com/api-create.php?url="
     constructURL := API + URL
-    rcvrChan := make(chan interface{})
-    response := &urlHandlerResponse{}
-    go checkHealth(URL, rcvrChan)
-    go shorten(constructURL, rcvrChan)
-
-    for value := range rcvrChan {
-        counter := 0
-        switch v := value.(type){
-            case bool:
-                fmt.Println("health", v)
-                response.health = v
-                counter++
-                fmt.Println(counter)
-                if (counter == 2){
-                    close(rcvrChan)
-                    break
-                }
-            case *newURL:
-                fmt.Println("URL", v.URL)
-                response.URL = v.URL
-                response.err = v.err
-                counter++
-                fmt.Println(counter)
-                if (counter == 2){
-                    close(rcvrChan)
-                    break
-                }
-        }
+    health := checkHealth(URL)
+    shortenResponse := shorten(constructURL)
+    if (health == true) {
+        return shortenResponse.URL
+    } else {
+        return "Error"
     }
-    return response
 }
 

@@ -18,6 +18,7 @@ func init() {
     flag.Parse()
 }
 
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
     if m.Content[0:2] == "sl" {
         if m.Content[3:5] == "-h" {
@@ -25,14 +26,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
             s.ChannelMessageSend(m.ChannelID, help)
         } else {
         URL := m.Content[3:]
-
-        urlHandlerResp := urlHandler(URL)
-        fmt.Println("response", urlHandlerResp.URL)
+        urlResponse := urlHandler(URL)
+        fmt.Println("response", urlResponse)
             /* TODO: 
              Print error message to chat.
              handle cli gracefully */
         s.ChannelMessageDelete(m.ChannelID, m.ID)
-        s.ChannelMessageSend(m.ChannelID, urlHandlerResp.URL)
+        s.ChannelMessageSend(m.ChannelID, urlResponse)
         }
     }
 }
