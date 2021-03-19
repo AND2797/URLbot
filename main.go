@@ -16,7 +16,6 @@ var (
 
 func init() {
     flag.StringVar(&Token, "t", "", "Bot Token")
-    //flag.StringVar(&Link, "l", "", "Link")
     flag.Parse()
 }
 
@@ -28,18 +27,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
         if err != nil {
             fmt.Println ("Error generating URl,", err)
         }
-        msg, err := s.ChannelMessageSend(m.ChannelID, shortened)
-        newMsgID = msg.ID
-        fmt.Println(newMsgID)
+
+        s.ChannelMessageDelete(m.ChannelID, m.ID)
+        s.ChannelMessageSend(m.ChannelID, shortened)
     }
 }
 
-func messageDelete(s *discordgo.Session, m *discordgo.MessageDelete){
-    fmt.Println("Delete time")
-    if m.Content[0:5] == "!link" {
-    s.ChannelMessageDelete(m.ChannelID, newMsgID)
-    }
-}
+//func messageDelete(s *discordgo.Session, m *discordgo.MessageDelete){
+//    fmt.Println("Delete time")
+//}
 
 func main() {
     dg, err := discordgo.New("Bot " + Token)
@@ -49,7 +45,7 @@ func main() {
     }
 
     dg.AddHandler(messageCreate)
-    dg.AddHandler(messageDelete)
+    //dg.AddHandler(messageDelete)
     dg.Identify.Intents = discordgo.IntentsGuildMessages
 
     err = dg.Open()
