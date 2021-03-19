@@ -20,6 +20,7 @@ func init() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
+    fmt.Println("In msg create")
     if m.Content[0:5] == "!link" {
         URL := m.Content[5:]
         shortened, err := shorten(URL)
