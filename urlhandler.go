@@ -13,6 +13,7 @@ func shorten(URL string) (string, error) {
 
     API := "https://tinyurl.com/api-create.php?url="
     constructURL := API + URL
+    fmt.Println(constructURL)
     resp, errGet := http.Get(constructURL)
     if errGet != nil{
         fmt.Println("Error in completing http request.")
