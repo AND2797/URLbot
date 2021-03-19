@@ -1,5 +1,4 @@
 package main
-
 import (
         "os"
         "os/signal"
@@ -20,15 +19,21 @@ func init() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
-    if m.Content[0:5] == "!link" {
-        URL := m.Content[6:]
-        shortened, err := shorten(URL)
-        if err != nil {
-            fmt.Println ("Error generating URl,", err)
-        }
+    if m.Content[0:2] == "sl" {
+        if m.Content[3:5] == "-h" {
+            help := "Use `sl <insert link>` to create link"
+            s.ChannelMessageSend(m.ChannelID, help)
+        } else {
+        URL := m.Content[3:]
 
+        urlHandlerResp := urlHandler(URL)
+        fmt.Println("response", urlHandlerResp.URL)
+            /* TODO: 
+             Print error message to chat.
+             handle cli gracefully */
         s.ChannelMessageDelete(m.ChannelID, m.ID)
-        s.ChannelMessageSend(m.ChannelID, shortened)
+        s.ChannelMessageSend(m.ChannelID, urlHandlerResp.URL)
+        }
     }
 }
 
@@ -39,12 +44,9 @@ func main() {
         fmt.Println("Error creating Discord session,", err)
         return
     }
-
     dg.AddHandler(messageCreate)
     dg.Identify.Intents = discordgo.IntentsGuildMessages
-
     err = dg.Open()
-
     if err != nil {
         fmt.Println("Error opening connection,",err)
         return
