@@ -20,7 +20,6 @@ func init() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
-    fmt.Println("msg crt")
     if m.Content[0:5] == "!link" {
         URL := m.Content[6:]
         shortened, err := shorten(URL)
@@ -33,9 +32,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
     }
 }
 
-//func messageDelete(s *discordgo.Session, m *discordgo.MessageDelete){
-//    fmt.Println("Delete time")
-//}
 
 func main() {
     dg, err := discordgo.New("Bot " + Token)
@@ -45,7 +41,6 @@ func main() {
     }
 
     dg.AddHandler(messageCreate)
-    //dg.AddHandler(messageDelete)
     dg.Identify.Intents = discordgo.IntentsGuildMessages
 
     err = dg.Open()
