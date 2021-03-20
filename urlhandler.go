@@ -49,7 +49,7 @@ func sanitizeURL(URL string) string {
 
 
 func checkHealth(URL string) bool {
-    /* TODO: return HTTP STATUS? */
+    /* TODO: check HTTP STATUS */
     URL = sanitizeURL(URL)
     _, errGet := http.Get(URL)
     fmt.Println(URL)

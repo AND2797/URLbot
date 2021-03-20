@@ -1,6 +1,7 @@
 package main
 import (
         "os"
+        "strconv"
         "os/signal"
         "syscall"
         "fmt"
@@ -21,17 +22,25 @@ func init() {
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
     if m.Content[0:2] == "sl" {
+        fmt.Println("HERE")
         if m.Content[3:5] == "-h" {
             help := "Use `sl <insert link>` to create link"
             s.ChannelMessageSend(m.ChannelID, help)
         } else {
         URL := m.Content[3:]
         urlResponse := urlHandler(URL)
+        shortenedBy := len(URL) - len(urlResponse)
         fmt.Println("response", urlResponse)
             /* TODO: 
              handle cli gracefully */
+        embedMSG := &discordgo.MessageEmbed{}
+        embedMSG.Description = urlResponse
+        embedMSG.Author = &discordgo.MessageEmbedAuthor{}
+        embedMSG.Author.Name = m.Author.Username
+        embedMSG.Footer = &discordgo.MessageEmbedFooter{}
+        embedMSG.Footer.Text = "Shortened by " + strconv.Itoa(shortenedBy) + " chars."
         s.ChannelMessageDelete(m.ChannelID, m.ID)
-        s.ChannelMessageSend(m.ChannelID, urlResponse)
+        s.ChannelMessageSendEmbed(m.ChannelID, embedMSG)
         }
     }
 }
