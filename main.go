@@ -29,7 +29,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate){
         urlResponse := urlHandler(URL)
         fmt.Println("response", urlResponse)
             /* TODO: 
-             Print error message to chat.
              handle cli gracefully */
         s.ChannelMessageDelete(m.ChannelID, m.ID)
         s.ChannelMessageSend(m.ChannelID, urlResponse)

@@ -5,6 +5,7 @@ import (
         "fmt"
     )
 
+
 type newURL struct {
     URL     string
     err      error
@@ -36,9 +37,23 @@ func shorten(URL string) *newURL {
     return shortenResponse
 }
 
+
+func sanitizeURL(URL string) string {
+
+    if (URL[0:8] != "https://" && URL[0:7] != "http://"){
+        URL = "https://" + URL
+    }
+
+    return URL
+}
+
+
 func checkHealth(URL string) bool {
     /* TODO: return HTTP STATUS? */
+    URL = sanitizeURL(URL)
     _, errGet := http.Get(URL)
+    fmt.Println(URL)
+    fmt.Println(errGet)
     if errGet != nil {
         // error getting response
         return false
@@ -51,10 +66,11 @@ func urlHandler(URL string) string{
     constructURL := API + URL
     health := checkHealth(URL)
     shortenResponse := shorten(constructURL)
+    fmt.Println("health,", health)
     if (health == true) {
         return shortenResponse.URL
     } else {
-        return "Error"
+        return "Error in generating link."
     }
 }
 
